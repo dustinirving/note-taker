@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
+const uuid = require("uuid");
 
 const app = express();
 const PORT = 3000;
@@ -20,26 +21,30 @@ app.get("/notes", function (req, res) {
 app.get("/api/notes", function (req, res) {
   fs.readFile("db/db.json", "utf8", function (err, data) {
     if (err) throw err;
-    const notes = JSON.parse(data);
-    return res.json(notes);
+    if (data === "") {
+      data = "[]";
+      fs.writeFile("db/db.json", data, function (err) {
+        if (err) throw err;
+      });
+    }
+    const addIdtoNotes = JSON.parse(data).map(function (note) {
+      if (!note.hasOwnProperty("id")) {
+        note.id = uuid.v4();
+      }
+      return note;
+    });
+    fs.writeFile("db/db.json", JSON.stringify(addIdtoNotes), function (err) {
+      if (err) throw err;
+    });
+
+    return res.json(addIdtoNotes);
   });
-  // res.sendFile(path.join(__dirname, "./db/db.json"));
 });
 
 app.post("/api/notes", function (req, res) {
-  // // Generate a random id
-  // const characters =
-  //   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?[\\]^_`{|}~";
-  // let uniqueId = "";
-  // for (let i = 0; i < 10; i++) {
-  //   uniqueId =
-  //     uniqueId + characters[Math.floor(Math.random() * characters.length)];
-  // }
-  // //
-
   let allNotes;
   const newNote = req.body;
-  newNote.id = newNote.title;
+  newNote.id = uuid.v4();
   fs.readFile("db/db.json", "utf8", function (err, data) {
     if (err) throw err;
     allNotes = JSON.parse(data);
@@ -59,8 +64,6 @@ app.delete("/api/notes/:id", function (req, res) {
     let allNotes = JSON.parse(data);
     const newNotes = allNotes.filter(function (note) {
       if (note.id !== query._id) {
-        console.log(note.id);
-        console.log(query._id);
         return note;
       }
     });
