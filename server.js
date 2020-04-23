@@ -8,7 +8,7 @@ const uuid = require("uuid");
 const app = express();
 
 // Setting up a port
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Allows the server to talk to the client
 app.use(express.static(__dirname + "/public"));
