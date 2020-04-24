@@ -17,14 +17,9 @@ app.use(express.urlencoded({ extended: true }));
 // Use json format with express
 app.use(express.json());
 
-// Get request to index page
-// Send the html file back
-app.get("/", function (req, res) {
-  res.sendFile(path.join(__dirname, "./public/index.html"));
-});
-
 // Get request for the notes path
 // Sends the notes.html file back to the client
+
 app.get("/notes", function (req, res) {
   res.sendFile(path.join(__dirname, "./public/notes.html"));
 });
@@ -56,6 +51,12 @@ app.get("/api/notes", function (req, res) {
 
     return res.json(addIdtoNotes);
   });
+});
+
+// Get request to index page
+// Send the html file back
+app.get("*", function (req, res) {
+  res.sendFile(path.join(__dirname, "./public/index.html"));
 });
 
 // Post reques
