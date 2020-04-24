@@ -56,6 +56,7 @@ app.get("/api/notes", function (req, res) {
 // Get request to index page
 // Send the html file back
 app.get("*", function (req, res) {
+  res.redirect("/");
   res.sendFile(path.join(__dirname, "./public/index.html"));
 });
 
